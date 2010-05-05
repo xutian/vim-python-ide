@@ -144,6 +144,8 @@ set fillchars=fold:-
 "---------------------------------------------------------------------
 " completion
 "---------------------------------------------------------------------
+
+"by tags
 set dictionary=/usr/share/dict/words
 let g:showfuncctagsbin = "/usr/bin/ctags"
 
