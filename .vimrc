@@ -113,6 +113,7 @@ set nobackup
 
 " Set mouse mod
 set mouse=a
+set mousemodel=popup
 
 " Try to show at least three lines and two columns of context when
 " scrolling
@@ -244,6 +245,16 @@ hi DiffDelete   ctermfg=0 ctermbg=1 guibg='red'
 hi DiffChange   ctermfg=0 ctermbg=3 guibg='yellow'
 
 au BufRead,BufNewFile *.* call Svndiff("next")
+
+" --------- Ctags
+
+nnoremap <silent> <F9> :TlistToggle<CR>
+" show list on the rightmost side of the window
+let Tlist_Use_Right_Window = 1
+" remove empty lines
+let Tlist_Compact_Format = 1
+" show Tlist menu in gVim
+let Tlist_Show_Menu = 1 
 
 "---------------------------------------------------------------------
 " Charsets  and locale
