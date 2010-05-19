@@ -27,12 +27,12 @@ au BufRead,BufNewFile *.c,*.h set noexpandtab
 au BufRead,BufNewFile Makefile* set noexpandtab
 
 " Use the below highlight group when displaying bad whitespace is desired
-highlight BadWhitespace ctermbg=red guibg=red
+" highlight BadWhitespace ctermbg=red guisp=red gui=undercurl guifg=NONE guibg=NONE
 
 " Display tabs at the beginning of a line in Python mode as bad.
-au BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
+" au BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
 " Make trailing whitespace be flagged as bad.
-au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
+" au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
 
 " Wrap text after a certain number of characters
 " Python: 79 
@@ -90,7 +90,7 @@ set autoindent
 set guifont=Terminus\ 10
 set background=dark
 syntax enable
-colorscheme desert256 
+colorscheme desert 
 
 "---------------------------------------------------------------------
 " Common settings
@@ -133,12 +133,7 @@ set wildmenu
 set wildignore=*.o,*~
 
 " If possible, try to use a narrow number column.
-if v:version >= 700
-    try
-        setlocal numberwidth=4
-    catch
-    endtry
-endif
+setlocal numberwidth=4
 
 set fillchars=fold:-
 
@@ -193,7 +188,7 @@ let g:proj_flags = "imstg"
 "---------------------------------------------------------------------
 
 setlocal foldcolumn=1
-setlocal number
+set number
 
 " сохранение текущего буфера
 imap <F2> <Esc>:w<CR>a
