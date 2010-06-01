@@ -89,7 +89,8 @@ set autoindent
 " highlight variable under cursor (not smart)
 " Python: yes
 " C: yes
-au BufNewFile *.py,*.pyw,*.c,*.h autocmd CursorMoved * exe printf('match IncSearch /\<%s\>/', expand('<cword>'))
+
+au BufRead,BufNewFile *.py,*.pyw,*.c  autocmd CursorMoved * silent! exe printf('match IncSearch /\<%s\>/', expand('<cword>'))
 
 " Folding based on indentation:
 " set foldmethod=indent
