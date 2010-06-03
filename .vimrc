@@ -261,6 +261,10 @@ let Tlist_Compact_Format = 1
 " show Tlist menu in gVim
 let Tlist_Show_Menu = 1 
 
+" --------- PyLint
+autocmd FileType python compiler pylint
+" Don't sow quickfix window. Manually can be opened by :cope
+let g:pylint_cwindow = 0
 "---------------------------------------------------------------------
 " Charsets  and locale
 "---------------------------------------------------------------------
