@@ -101,7 +101,7 @@ au BufRead,BufNewFile *.py,*.pyw,*.c  autocmd CursorMoved * silent! exe printf('
 set guifont=Terminus\ 10
 set background=dark
 syntax enable
-colorscheme desert 
+colorscheme desert256 
 
 "---------------------------------------------------------------------
 " Common settings
@@ -252,7 +252,6 @@ hi DiffChange   ctermfg=0 ctermbg=3 guibg='yellow'
 au BufRead,BufNewFile *.* call Svndiff("next")
 
 " --------- Ctags
-
 nnoremap <silent> <F9> :TlistToggle<CR>
 " show list on the rightmost side of the window
 let Tlist_Use_Right_Window = 1
@@ -263,8 +262,11 @@ let Tlist_Show_Menu = 1
 
 " --------- PyLint
 autocmd FileType python compiler pylint
-" Don't sow quickfix window. Manually can be opened by :cope
+" Don't show quickfix window. Manually can be opened by :cope
 let g:pylint_cwindow = 0
+" Don't show style errors
+let g:pylint_conditions = 0
+
 "---------------------------------------------------------------------
 " Charsets  and locale
 "---------------------------------------------------------------------
