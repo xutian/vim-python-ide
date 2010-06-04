@@ -7,6 +7,7 @@
 "     Artur Wroblewski
 "     Menno
 "     Jose Blanca
+"     Bogdan Frankovskyi
 "
 " Installation:
 "   Drop pylint.vim in ~/.vim/compiler directory. Ensure that your PATH
@@ -35,12 +36,24 @@
 "
 "       let g:pylint_cwindow = 0
 "
-"   Setting signs for the lines with errors can be disabled with
+"   Setting signs for the lines with errors can be enabled with
 "
-"	let g:pylint_signs = 0
+"	let g:pylint_signs = 1
 "
 "   Of course, standard :make command can be used as in case of every
 "   other compiler.
+"
+"   Setting highlights for the lines can be disabled with
+"
+"       let g:pylint_inline_highlight = 0
+"
+"   Coding style warning highlight can be disabled with
+"
+"       let g:pylint_conventions = 0
+"
+"   Warning highlight can be disabled with
+"   
+"       let g:pylint_warning = 0
 "
 
 if exists('current_compiler')
@@ -52,6 +65,10 @@ if !exists('g:pylint_onwrite')
     let g:pylint_onwrite = 1
 endif
 
+if !exists('g:pylint_onfly')
+    let g:pylint_onfly = 0
+endif
+
 if !exists('g:pylint_show_rate')
     let g:pylint_show_rate = 1
 endif
@@ -61,15 +78,19 @@ if !exists('g:pylint_cwindow')
 endif
 
 if !exists('g:pylint_signs')
-    let g:pylint_signs = 1
+    let g:pylint_signs = 0
+endif
+
+if !exists('g:pylint_inline_highlight')
+    let g:pylint_inline_highlight = 1
 endif
 
 if !exists('g:pylint_warning')
     let g:pylint_warning = 1
 endif
 
-if !exists('g:pylint_conditions')
-    let g:pylint_conditions = 1
+if !exists('g:pylint_conventions')
+    let g:pylint_conventions = 1
 endif
 
 if exists(':Pylint') != 2
@@ -115,11 +136,14 @@ if g:pylint_onwrite
     augroup end
 endif
 
+if g:pylint_onfly
+    augroup python
+        au!
+        au BufRead,BufNewFile * call Pylint(1)
+    augroup end
+endif
+
 function! Pylint(writing)
-    if !a:writing && &modified
-        " Save before running
-        write
-    endif	
 
     if has('win32') || has('win16') || has('win95') || has('win64')
         setlocal sp=>%s
@@ -145,7 +169,11 @@ function! Pylint(writing)
     endif
 
     if g:pylint_signs
-        call PylintHighlight() "call PlacePylintSigns()
+        call PlacePylintSigns()
+    endif
+    
+    if g:pylint_inline_highlight
+        call PylintHighlight() 
     endif
 endfunction
 
@@ -198,7 +226,7 @@ endfunction
     function! PylintHighlight()
         highlight link PyError SpellBad
         highlight link PyWarning SpellRare
-        highlight link PyConditions SpellCap
+        highlight link PyConventions SpellCap
        
 	"clear all already highlighted
         if exists("b:cleared")
@@ -221,13 +249,14 @@ endfunction
 	    let s:matchDict['message'] = item.text
             let b:matchedlines[item.lnum] = s:matchDict
 
-	    " highlight lines with errors
+	    " highlight lines with errors (only word characters) without end
+	    " of line
 	    if item.type == 'E'
-                let s:mID = matchadd("PyError", '\%' . item.lnum . 'l\n\@!')
+                call matchadd("PyError", '\w\%' . item.lnum . 'l\n\@!')
             elseif item.type == 'W' && g:pylint_warning 
-                let s:mID = matchadd("PyWarning", '\%' . item.lnum . 'l\n\@!')
-	    elseif item.type == 'C' && g:pylint_conditions
-                let s:mID = matchadd("PyConditions", '\%' . item.lnum . 'l\n\@!')
+                call matchadd("PyWarning", '\w\%' . item.lnum . 'l\n\@!')
+	    elseif item.type == 'C' && g:pylint_conventions
+                call matchadd("PyConventions", '\w\%' . item.lnum . 'l\n\@!')
 	    endif
 
             call add(b:matched, s:matchDict)
@@ -250,7 +279,7 @@ if !exists("*s:WideMsg")
     endfun
 endif
 
-if !exists('*sGetPylintMessage')
+if !exists('*s:GetPylintMessage')
 function s:GetPylintMessage()
     let s:cursorPos = getpos(".")
 
@@ -279,7 +308,7 @@ if !exists('*s:ClearHighlight')
     function s:ClearHighlight()
         let s:matches = getmatches()
         for s:matchId in s:matches
-            if s:matchId['group'] == 'PyError'
+            if s:matchId['group'] == 'PyError' || s:matchId['group'] == 'PyWarning'
                 call matchdelete(s:matchId['id'])
             endif
         endfor
