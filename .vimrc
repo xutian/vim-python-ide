@@ -265,7 +265,7 @@ autocmd FileType python compiler pylint
 " Don't show quickfix window. Manually can be opened by :cope
 let g:pylint_cwindow = 0
 " Don't show style errors
-let g:pylint_conditions = 0
+let g:pylint_conventions = 0
 
 "---------------------------------------------------------------------
 " Charsets  and locale
