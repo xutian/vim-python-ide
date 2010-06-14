@@ -105,7 +105,7 @@ au CursorHold <buffer> call s:GetPylintMessage()
 au CursorMoved <buffer> call s:GetPylintMessage()
 
 
-" We should echo filename because pylint truncates .py
+" We оhouldиechр filename because pylint truncates .py
 " If someone know better way - let me know :) 
 " CompilerSet makeprg=(echo\ '[%]';\ pylint\ -r\ y\ %)
 " modified by Jose Blanca
@@ -238,28 +238,32 @@ endfunction
             let b:cleared = 1
         endif
         
-        let b:matched = []
         let b:matchedlines = {}
 	
         " get all messages from qicklist
         let l:list = getqflist()
         for l:item in l:list
-            let s:matchDict = {}
-            let s:matchDict['linenum'] = item.lnum
-	    let s:matchDict['message'] = item.text
-            let b:matchedlines[item.lnum] = s:matchDict
-
 	    " highlight lines with errors (only word characters) without end
 	    " of line
-	    if item.type == 'E'
-                call matchadd("PyError", '\w\%' . item.lnum . 'l\n\@!')
+            let l:matchDict = {}
+            let l:matchDict['linenum'] = l:item.lnum
+	    let l:matchDict['message'] = l:item.text
+	    if l:item.type == 'E'
+		if !has_key(b:matchedlines, l:item.lnum)
+                 let b:matchedlines[l:item.lnum] = l:matchDict
+                 call matchadd("PyError", '\w\%' . l:item.lnum . 'l\n\@!')
+		endif
             elseif item.type == 'W' && g:pylint_warning 
-                call matchadd("PyWarning", '\w\%' . item.lnum . 'l\n\@!')
+		if !has_key(b:matchedlines, l:item.lnum)
+                 let b:matchedlines[l:item.lnum] = l:matchDict
+                 call matchadd("PyWarning", '\w\%' . l:item.lnum . 'l\n\@!')
+		endif
 	    elseif item.type == 'C' && g:pylint_conventions
-                call matchadd("PyConventions", '\w\%' . item.lnum . 'l\n\@!')
+		if !has_key(b:matchedlines, l:item.lnum)
+                 let b:matchedlines[item.lnum] = l:matchDict
+                 call matchadd("PyConventions", '\w\%' . l:item.lnum . 'l\n\@!')
+		endif
 	    endif
-
-            call add(b:matched, s:matchDict)
 	endfor
         let b:cleared = 0
     endfunction
@@ -267,32 +271,32 @@ endfunction
     " keep track of whether or not we are showing a message
 let b:showing_message = 0
 
-" WideMsg() prints [long] message up to (&columns-1) length
-" guaranteed without "Press Enter" prompt.
-if !exists("*s:WideMsg")
-    function s:WideMsg(msg)
-        let x=&ruler | let y=&showcmd
-        set noruler noshowcmd
-        redraw
-        echo a:msg
-        let &ruler=x | let &showcmd=y
-    endfun
-endif
+ " WideMsg() prints [long] message up to (&columns-1) length
+ " guaranteed without "Press Enter" prompt.
+"if !exists("*s:WideMsg")
+"    function s:WideMsg(msg)
+"        let x=&ruler | let y=&showcmd
+"        set noruler noshowcmd
+"        redraw
+"        echo a:msg
+"        let &ruler=x | let &showcmd=y
+"    endfun
+"endif
 
 if !exists('*s:GetPylintMessage')
 function s:GetPylintMessage()
-    let s:cursorPos = getpos(".")
+    let l:cursorPos = getpos(".")
 
-    " Bail if RunPyflakes hasn't been called yet.
+    " Bail if Pylint hasn't been called yet.
     if !exists('b:matchedlines')
         return
     endif
-
     " if there's a message for the line the cursor is currently on, echo
     " it to the console
-    if has_key(b:matchedlines, s:cursorPos[1])
-        let s:pylintMatch = get(b:matchedlines, s:cursorPos[1])
-        call s:WideMsg(s:pylintMatch['message'])
+    if has_key(b:matchedlines, l:cursorPos[1])
+        let l:pylintMatch = get(b:matchedlines, l:cursorPos[1])
+	echo l:pylintMatch['message'] 
+        "call s:WideMsg(l:pylintMatch['message'])
         let b:showing_message = 1
         return
     endif
@@ -306,13 +310,12 @@ endif
 
 if !exists('*s:ClearHighlight')
     function s:ClearHighlight()
-        let s:matches = getmatches()
-        for s:matchId in s:matches
-            if s:matchId['group'] == 'PyError' || s:matchId['group'] == 'PyWarning'
-                call matchdelete(s:matchId['id'])
+        let l:matches = getmatches()
+        for l:matchId in l:matches
+            if l:matchId['group'] == 'PyError' || l:matchId['group'] == 'PyWarning' || l:matchId['group'] == 'PyConventions'
+                call matchdelete(l:matchId['id'])
             endif
         endfor
-        let b:matched = []
         let b:matchedlines = {}
         let b:cleared = 1
     endfunction
