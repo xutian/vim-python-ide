@@ -35,9 +35,9 @@ au BufRead,BufNewFile Makefile* set noexpandtab
 " au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
 
 " Wrap text after a certain number of characters
-" Python: 79 
-" C: 79
-au BufRead,BufNewFile *.py,*.pyw,*.c,*.h set textwidth=79
+" Python: 120
+" C: 120
+au BufRead,BufNewFile *.py,*.pyw,*.c,*.h set textwidth=120
 
 " Turn off settings in 'formatoptions' relating to comment formatting.
 " - c : do not automatically insert the comment leader when wrapping based on
@@ -68,8 +68,6 @@ set encoding=utf-8
 " For full syntax highlighting:
 let python_highlight_all=1
 set syntax=on
-
-" Filetype special tasks on
 filetype on
 
 " Automatically indent based on file type: 
@@ -80,7 +78,6 @@ filetype plugin on
 
 " Keep indentation level from previous line: 
 set autoindent
-
 
 "---------------------------------------------------------------------
 " Python IDE relatd staff
@@ -98,10 +95,11 @@ au BufRead,BufNewFile *.py,*.pyw,*.c  autocmd CursorMoved * silent! exe printf('
 "---------------------------------------------------------------------
 " gVim - related staff
 "---------------------------------------------------------------------
-set guifont=Terminus\ 10
+"set guifont=Terminus\ 10
+set guifont=Terminus\ 14
 set background=dark
 syntax enable
-colorscheme desert256 
+colorscheme desert 
 
 "---------------------------------------------------------------------
 " Common settings
@@ -237,10 +235,9 @@ function! TabWrapperRope()
 endfunction
 
 au BufRead,BufNewFile *.py,*pyw imap <Tab> <C-R>=TabWrapperRope()<CR>
-
-imap <silent><C-Space> <ESC>l:RopeCodeAssist<CR>
-nmap <silent><C-Space> :RopeCodeAssist<CR>
-nnoremap <silent>, :call RopeShowDoc()<CR>
+au BufRead,BufNewFile *.py,*pyw imap <silent><C-Space> <ESC>l:RopeCodeAssist<CR>
+au BufRead,BufNewFile *.py,*pyw nmap <silent><C-Space> :RopeCodeAssist<CR>
+au BufRead,BufNewFile *.py,*pyw nnoremap <silent>, :call RopeShowDoc()<CR>
 
 " --------- Svndiff
 let g:svndiff_autoupdate = 1 
@@ -260,12 +257,14 @@ let Tlist_Compact_Format = 1
 " show Tlist menu in gVim
 let Tlist_Show_Menu = 1 
 
-" --------- PyLint
+" --------- Pylint
 autocmd FileType python compiler pylint
 " Don't show quickfix window. Manually can be opened by :cope
 let g:pylint_cwindow = 0
 " Don't show style errors
 let g:pylint_conventions = 0
+" Check file 'on fly'
+let g:pylint_onfly = 0
 
 "---------------------------------------------------------------------
 " Charsets  and locale
