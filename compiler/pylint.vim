@@ -112,7 +112,7 @@ au CursorMoved <buffer> call s:GetPylintMessage()
 " it does not list the info messages and it lists errors first
 " pylint -i y hola.py|grep -e '^[WECY]'|sed -e 's/^W/2 W /' -e 's/^E/1 E /' -e
 " 's/^C/3 C /' |sort -k1,3
-CompilerSet makeprg=(echo\ '[%]';pylint\ -i\ y\ %\\\|grep\ -e\ \'^[WECY]\'\\\|sed\ -e\ \'s/^E/1\ E\ /\'\ -e\ \'s/^W/2\ W\ /\'\ -e\ \'s/^C/3\ C\ /\'\ \\\|sort\ -k1,3)
+CompilerSet makeprg=(echo\ '[%]';pylint\ -i\ y\ %\\\|grep\ -e\ \'^[WECY]\'\\\|sed\ -e\ \'s/^E/1\ E\ /\'\ -e\ \'s/^W/2\ W\ /\'\ -e\ \'s/^C/3\ C\ /\'\ -e\ \'s/:[\.\ _a-Z]*:/:/g\'\ \\\|sort\ -k1,3)
 
 " We could omit end of file-entry, there is only one file
 " %+I... - include code rating information
@@ -139,12 +139,12 @@ endif
 if g:pylint_onfly
     augroup python
         au!
-        au BufRead,BufNewFile * call Pylint(1)
+        au BufRead * call Pylint(1)
     augroup end
 endif
 
+if !exists("*s:Pylint")
 function! Pylint(writing)
-
     if has('win32') || has('win16') || has('win95') || has('win64')
         setlocal sp=>%s
     else
@@ -176,6 +176,7 @@ function! Pylint(writing)
         call PylintHighlight() 
     endif
 endfunction
+endif
 
 function! PylintEvaluation()
     let l:list = getqflist()
@@ -223,6 +224,7 @@ function! PlacePylintSigns()
     call PylintHighlight()
 endfunction
 
+if !exists("*s:PylintHighlight")
     function! PylintHighlight()
         highlight link PyError SpellBad
         highlight link PyWarning SpellRare
@@ -267,21 +269,22 @@ endfunction
 	endfor
         let b:cleared = 0
     endfunction
+endif
 
-    " keep track of whether or not we are showing a message
+" keep track of whether or not we are showing a message
 let b:showing_message = 0
 
- " WideMsg() prints [long] message up to (&columns-1) length
- " guaranteed without "Press Enter" prompt.
-"if !exists("*s:WideMsg")
-"    function s:WideMsg(msg)
-"        let x=&ruler | let y=&showcmd
-"        set noruler noshowcmd
-"        redraw
-"        echo a:msg
-"        let &ruler=x | let &showcmd=y
-"    endfun
-"endif
+" WideMsg() prints [long] message up to (&columns-1) length
+" guaranteed without "Press Enter" prompt.
+if !exists("*s:WideMsg")
+    function s:WideMsg(msg)
+        let x=&ruler | let y=&showcmd
+        set noruler noshowcmd
+        redraw
+        echo a:msg
+        let &ruler=x | let &showcmd=y
+    endfun
+endif
 
 if !exists('*s:GetPylintMessage')
 function s:GetPylintMessage()
@@ -295,8 +298,7 @@ function s:GetPylintMessage()
     " it to the console
     if has_key(b:matchedlines, l:cursorPos[1])
         let l:pylintMatch = get(b:matchedlines, l:cursorPos[1])
-	echo l:pylintMatch['message'] 
-        "call s:WideMsg(l:pylintMatch['message'])
+        call s:WideMsg(l:pylintMatch['message'])
         let b:showing_message = 1
         return
     endif
